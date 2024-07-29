@@ -60,7 +60,7 @@ popupCloseImage.addEventListener('click', () => {
 popupImageCard.addEventListener('click', () => {
   closeOverlayModal(popupImageCard);
 });
-// добавление картинки
+// добавление  картинки
 newCardFormElement.addEventListener('submit', (evt) => {
   evt.preventDefault();
   const cardData = {
