@@ -6,9 +6,7 @@
         content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Mesto</title>
-  <link rel="stylesheet" href="./pages/index.css">
-  <script src="./scripts/cards.js" defer></script>
-  <script src="./scripts/index.js" defer></script>
+  <!-- <link rel="stylesheet" href="./pages/index.css"> -->
 </head>
 <body class="page">
 <div class="page__content">
@@ -37,9 +35,9 @@
   </footer>
   <div class="popup popup_type_edit">
     <div class="popup__content">
-      <button type="button" class="popup__close"></button>
+      <button type="button" class="popup__close popup__close-edit"></button>
       <h3 class="popup__title">Редактировать профиль</h3>
-      <form class="popup__form" name="edit-profile">
+      <form class="" name="edit-profile">
         <input type="text" name="name" class="popup__input popup__input_type_name" placeholder="Имя" required>
         <input type="text" name="description" class="popup__input popup__input_type_description" placeholder="Занятие" required>
         <button type="submit" class="button popup__button">Сохранить</button>
@@ -48,7 +46,7 @@
   </div>
   <div class="popup popup_type_new-card">
     <div class="popup__content">
-      <button type="button" class="popup__close"></button>
+      <button type="button" class="popup__close popup__close-new-card"></button>
       <h3 class="popup__title">Новое место</h3>
       <form class="popup__form" name="new-place">
         <input type="text" name="place-name" class="popup__input popup__input_type_card-name" placeholder="Название" required>
@@ -59,7 +57,7 @@
   </div>
   <div class="popup popup_type_image">
     <div class="popup__content popup__content_content_image">
-      <button type="button" class="popup__close"></button>
+      <button type="button" class="popup__close popup__close-image"></button>
       <img src="" alt="" class="popup__image">
       <p class="popup__caption"></p>
     </div>
