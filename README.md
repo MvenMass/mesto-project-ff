@@ -1,3 +1,3 @@
 # Проектная работа Mesto
 dd
-https://github.com/MvenMass/mesto-project-ff
+https://mvenmass.github.io/mesto-project-ff/
