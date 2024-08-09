@@ -234,4 +234,6 @@ editAvatarButton.addEventListener("click", handleEditAvatarClick);
 avatarCloseButton.addEventListener("click", () => closeModal(avatarPopup));
 avatarForm.addEventListener("submit", handleAvatarFormSubmit);
 
+enableValidation(validationConfig);
+
  export {placeList, popupImageCard, popupImageContent, popupImageCaption};
