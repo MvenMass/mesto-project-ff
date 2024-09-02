@@ -25,3 +25,7 @@
     line-height: 17px;
   }
 }
+
+.error_btn {
+  background-color: #acacac;
+}
