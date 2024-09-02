@@ -1,100 +1,61 @@
 // Конфигурация для взаимодействия с сервером
-const config = {
-    baseUrl: "https://nomoreparties.co/v1/wff-cohort-19",
-    headers: {
-      authorization: "bcfec8b0-2ae3-4b58-8a1b-3a3477b2dfdf",
-      "Content-Type": "application/json",
-    },
+const config = { 
+  baseUrl: "https://nomoreparties.co/v1/wff-cohort-21", 
+  headers: { 
+    authorization: "26238813-c771-4ea0-a68b-8fd02c289a4d", 
+    "Content-Type": "application/json", 
+  }, 
+};
+
+// Функция для создания запросов
+const sendRequest = async (endpoint, method = 'GET', body = null) => {
+  const url = `${config.baseUrl}${endpoint}`;
+  const options = {
+    method,
+    headers: config.headers,
+    ...(body && { body: JSON.stringify(body) }),
   };
-  
-  // Функция для проверки ответа сервера
-  const checkResponse = (res) => {
-    if (res.ok) {
-      return res.json();
-    }
-    return Promise.reject(`Ошибка: ${res.status}`);
-  };
-  
-  // Функция для получения начальных карточек
-  const getInitialCards = () => {
-    return fetch(`${config.baseUrl}/cards`, {
-      headers: config.headers,
-    }).then(checkResponse);
-  };
-  
-  // Функция для получения информации о пользователе
-  const getUserInfo = () => {
-    return fetch(`${config.baseUrl}/users/me`, {
-      headers: config.headers,
-    }).then(checkResponse);
-  };
-  
-  // Функция для обновления информации о пользователе
-  const updateUserInfo = (name, about) => {
-    return fetch(`${config.baseUrl}/users/me`, {
-      method: "PATCH",
-      headers: config.headers,
-      body: JSON.stringify({
-        name: name, // Новое имя пользователя
-        about: about, // Новое описание пользователя
-      }),
-    }).then(checkResponse);
-  };
-  
-  // Функция для добавления новой карточки
-  const addNewCard = (name, link) => {
-    return fetch(`${config.baseUrl}/cards`, {
-      method: "POST",
-      headers: config.headers,
-      body: JSON.stringify({
-        name: name, // Имя новой карточки
-        link: link, // Ссылка на изображение карточки
-      }),
-    }).then(checkResponse);
-  };
-  
-  // Функция для удаления карточки
-  const deleteCardElement = (cardId) => {
-    return fetch(`${config.baseUrl}/cards/${cardId}`, {
-      method: "DELETE",
-      headers: config.headers,
-    }).then(checkResponse);
-  };
-  
-  // Функция для обновления аватара пользователя
-  const updateAvatar = (avatarUrl) => {
-    return fetch(`${config.baseUrl}/users/me/avatar`, {
-      method: "PATCH",
-      headers: config.headers, 
-      body: JSON.stringify({
-        avatar: avatarUrl,
-      }),
-    }).then(checkResponse);
-  };
-  
-  // Функция для лайка карточки
-  const likeCard = (cardId) => {
-    return fetch(`${config.baseUrl}/cards/likes/${cardId}`, {
-      method: "PUT",
-      headers: config.headers,
-    }).then(checkResponse);
-  };
-  
-  // Функция для снятия лайка с карточки
-  const unlikeCard = (cardId) => {
-    return fetch(`${config.baseUrl}/cards/likes/${cardId}`, {
-      method: "DELETE",
-      headers: config.headers,
-    }).then(checkResponse);
-  };
-  
-  export {
-    getInitialCards,
-    getUserInfo,
-    updateUserInfo,
-    addNewCard,
-    deleteCardElement,
-    updateAvatar,
-    likeCard,
-    unlikeCard,
-  };
+
+  try {
+    const response = await fetch(url, options);
+    if (!response.ok) throw new Error(`Ошибка: ${response.status}`);
+    return response.json();
+  } catch (error) {
+    return Promise.reject(error.message);
+  }
+};
+
+// Функция для получения начальных карточек
+const getCards = () => sendRequest('/cards');
+
+// Функция для получения информации о пользователе
+const getUser = () => sendRequest('/users/me');
+
+// Функция для обновления информации о пользователе
+const updateUser = (name, about) => sendRequest('/users/me', 'PATCH', { name, about });
+
+// Функция для добавления новой карточки
+const addNewCard = (name, link) => sendRequest('/cards', 'POST', { name, link });
+
+// Функция для удаления карточки
+const deleteCardElement = (cardId) => sendRequest(`/cards/${cardId}`, 'DELETE');
+
+// Функция для обновления аватара пользователя
+const updateAvatar = (avatarUrl) => sendRequest('/users/me/avatar', 'PATCH', { avatar: avatarUrl });
+
+// Функция для лайка карточки
+const likeCard = (cardId) => sendRequest(`/cards/likes/${cardId}`, 'PUT');
+
+// Функция для снятия лайка с карточки
+const unlikeCard = (cardId) => sendRequest(`/cards/likes/${cardId}`, 'DELETE');
+
+export { 
+  getCards,
+  getUser,
+  updateUser,
+  addNewCard,
+  deleteCardElement,
+  updateAvatar,
+  likeCard,
+  unlikeCard,
+};

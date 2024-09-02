@@ -1,114 +1,108 @@
-function checkInputValidity(inputElement, config) {
-    let errorMessage = "";
-  
-    // Проверяем, если поле пустое и обязательно
-    if (inputElement.validity.valueMissing) {
-      errorMessage = "Вы пропустили это поле.";
-    }
-    // Проверяем минимальную длину
-    else if (inputElement.validity.tooShort) {
-      errorMessage = `Должно быть от ${inputElement.minLength} до ${inputElement.maxLength} символов.`;
-    }
-    // Проверяем допустимость символов
-    else if (inputElement.validity.patternMismatch) {
-      errorMessage = inputElement.dataset.errorMessage || "Неверный формат.";
-    }
-    // Проверяем тип значения (например, URL)
-    else if (inputElement.validity.typeMismatch) {
-      if (inputElement.type === "url") {
-        errorMessage = "Введите адрес картинки.";
-      } else {
-        errorMessage = "Введите корректное значение.";
-      }
-    }
-  
-    inputElement.validity.valid
-      ? hideError(inputElement, config)
-      : showError(inputElement, errorMessage, config);
+/**
+ * Проверяет валидность поля и отображает ошибку, если есть.
+ */
+function validateInput(input, config) {
+  const validityState = input.validity;
+  const errorText = getErrorText(validityState, input, config);
+
+  displayValidationError(input, errorText, config);
+}
+
+/**
+ * Получает текст сообщения об ошибке на основе состояния валидности.
+ */
+function getErrorText(validityState, input, config) {
+  if (validityState.valueMissing) {
+    return "Вы пропустили это поле.";
   }
 
-  function hideError(inputElement, config) {
-    if (!inputElement) {
-      console.error("Input element is null or undefined.");
-      return;
-    }
-    
-    const errorElement = inputElement
-    .closest(config.formSelector) 
-    .querySelector(`.${inputElement.name}-input-error`); 
-    
-    if (errorElement) {
-      errorElement.textContent = "";
-      errorElement.classList.remove(config.errorClass);
-      inputElement.classList.remove(config.inputErrorClass);
-    }
+  if (validityState.tooShort) {
+    return `Должно быть от ${input.minLength} до ${input.maxLength} символов.`;
   }
-  
-  // Функция для отображения сообщения об ошибке
-  function showError(inputElement, errorMessage, config) {
-    const errorElement = inputElement
-      .closest(config.formSelector)
-      .querySelector(`.${inputElement.name}-input-error`);
-  
-    if (errorElement) {
-      errorElement.textContent = errorMessage;
-      errorElement.classList.add(config.errorClass);
-      inputElement.classList.add(config.inputErrorClass);
+
+  if (validityState.patternMismatch) {
+    return input.dataset.errorMessage || "Неверный формат.";
+  }
+
+  if (validityState.typeMismatch) {
+    return input.type === "url" ? "Введите адрес картинки." : "Введите корректное значение.";
+  }
+  return "";
+}
+/**
+ * Отображает или скрывает ошибку для поля ввода.
+ */
+function displayValidationError(input, errorText, config) {
+  const form = input.closest(config.formSelector);
+  const errorField = form.querySelector(`.${input.name}-input-error`);
+
+  if (errorText) {
+    if (errorField) {
+      errorField.textContent = errorText;
+      errorField.classList.add(config.errorClass);
+      input.classList.add(config.inputErrorClass);
     }
-  }
-  
-  // Функция для проверки всех полей формы
-  function hasInvalidInput(inputList) {
-    return inputList.some((inputElement) => !inputElement.validity.valid);
-  }
-  
-  // Функция для включения или отключения кнопки в зависимости от валидности формы
-  function toggleButtonState(inputList, buttonElement, config) {
-    if (hasInvalidInput(inputList)) {
-      buttonElement.classList.add(config.inactiveButtonClass);
-      buttonElement.disabled = true;
-    } else {
-      buttonElement.classList.remove(config.inactiveButtonClass);
-      buttonElement.disabled = false;
+  } else {
+    if (errorField) {
+      errorField.textContent = "";
+      errorField.classList.remove(config.errorClass);
+      input.classList.remove(config.inputErrorClass);
     }
   }
-  
-  // Функция для включения валидации
-  function enableValidation(config) {
-    const formList = Array.from(document.querySelectorAll(config.formSelector));
-  
-    formList.forEach((formElement) => {
-      const inputList = Array.from(
-        formElement.querySelectorAll(config.inputSelector)
-      );
-      const buttonElement = formElement.querySelector(
-        config.submitButtonSelector
-      );
-  
-      inputList.forEach((inputElement) => {
-        inputElement.addEventListener("input", () => {
-          checkInputValidity(inputElement, config);
-          toggleButtonState(inputList, buttonElement, config);
-        });
-      });
-  
-      formElement.addEventListener("submit", (event) => event.preventDefault());
-  
-      toggleButtonState(inputList, buttonElement, config);
+}
+
+/**
+ * Проверяет, все ли поля ввода валидны.
+ */
+function checkAllInputsValid(inputs) {
+  return Array.from(inputs).every(input => input.validity.valid);
+}
+
+/**
+ * Обновляет состояние кнопки отправки в зависимости от валидности полей.
+ */
+function updateSubmitButtonState(inputs, button, config) {
+  const shouldDisable = !checkAllInputsValid(inputs);
+
+  button.classList.toggle(config.inactiveButtonClass, shouldDisable);
+  button.disabled = shouldDisable;
+}
+
+/**
+ * Инициализирует валидацию для всех форм на странице.
+*/
+function enableValidation(config) {
+  document.querySelectorAll(config.formSelector).forEach(form => {
+    const inputs = form.querySelectorAll(config.inputSelector);
+    const submitButton = form.querySelector(config.submitButtonSelector);
+
+    // Обработчик событий для полей ввода
+    form.addEventListener("input", event => {
+      if (event.target.matches(config.inputSelector)) {
+        validateInput(event.target, config);
+        updateSubmitButtonState(inputs, submitButton, config);
+      }
     });
-  }
-  
-  // Функция для очистки ошибок валидации
-  function clearValidation(formElement, config) {
-    const inputList = Array.from(
-      formElement.querySelectorAll(config.inputSelector)
-    );
-    const buttonElement = formElement.querySelector(config.submitButtonSelector);
-  
-    inputList.forEach((inputElement) => hideError(inputElement, config));
-  
-    buttonElement.classList.add(config.inactiveButtonClass);
-    buttonElement.disabled = true;
-  }
-  
-  export { enableValidation, clearValidation };
+
+    // Отключаем отправку формы по умолчанию
+    form.addEventListener("submit", event => event.preventDefault());
+
+    // Устанавливаем начальное состояние кнопки отправки
+    updateSubmitButtonState(inputs, submitButton, config);
+  });
+}
+
+/**
+ * Очищает ошибки валидации и деактивирует кнопку отправки.
+ */
+function clearValidation(form, config) {
+  const inputs = Array.from(form.querySelectorAll(config.inputSelector));
+  const button = form.querySelector(config.submitButtonSelector);
+
+  inputs.forEach(input => displayValidationError(input, "", config));
+
+  button.classList.add(config.inactiveButtonClass);
+  button.disabled = true;
+}
+
+export { enableValidation, clearValidation };
