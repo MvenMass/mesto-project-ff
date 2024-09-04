@@ -1,4 +1,4 @@
-import { createCard, handleLike } from './components/card.js'; 
+import { createCard, handleLike, removeCardElement } from './components/card.js'; 
 import { openModal, closeModal } from './components/modal.js'; 
 import { enableValidation, clearValidation } from "./components/validation.js"; 
 import { getUser, getCards, updateUser, addNewCard, updateAvatar, deleteCardElement } from "./components/api.js"; 
@@ -77,7 +77,7 @@ function handleAddCardFormSubmit(evt) {
     placeList.prepend(createCard(newCard, handleImageClick, handleLike, handleDeleteClick, newCard.owner._id));
     closeModal(popupNewCard);
     newCardFormElement.reset();
-    clearValidation(newCardFormElement, validationConfig);
+    // clearValidation(newCardFormElement, validationConfig);
   }, "Создание...");
 }
 
@@ -93,7 +93,7 @@ function handleDeleteClick(evt, cardId, cardElement) {
   confirmButton.onclick = () => {
     confirmButton.textContent = "Удаление...";
     deleteCardElement(cardId).then(() => {
-      cardElement.remove();
+      removeCardElement(cardElement);
       closeModal(confirmPopup);
     }).catch(console.log).finally(() => {
       confirmButton.textContent = "Да";
@@ -114,27 +114,33 @@ function handleAvatarFormSubmit(evt) {
   }, "Сохранение...");
 }
 
-function setupListeners() {
+function setupListeners() { 
+  const popups = document.querySelectorAll('.popup');
+  popups.forEach((popup) => {
+    const closeButton = popup.querySelector('.popup__close');
+    closeButton.addEventListener('click', () => closeModal(popup));
+    popup.addEventListener('mousedown', (event) => {
+      if (event.target === event.currentTarget) {
+        closeModal(popup);
+      }
+    });
+    popup.classList.add('popup_is-animated');
+  });
   document.querySelector('.profile__edit-button').addEventListener("click", handleProfileEdit);
-  popupTypeEdit.querySelector('.popup__close').addEventListener("click", () => closeModal(popupTypeEdit));
-  document.querySelector('.profile__add-button').addEventListener("click", () => {
-    openModal(popupNewCard);
-    newCardFormElement.reset();
-    clearValidation(newCardFormElement, validationConfig);
+  document.querySelector('.profile__add-button').addEventListener("click", () => { 
+    openModal(popupNewCard); 
+    newCardFormElement.reset(); 
+    clearValidation(newCardFormElement, validationConfig); 
   });
-  popupNewCard.querySelector('.popup__close').addEventListener("click", () => closeModal(popupNewCard));
-  popupImageCard.querySelector('.popup__close').addEventListener("click", () => closeModal(popupImageCard));
-  profileAvatar.addEventListener("click", () => {
-    openModal(avatarPopup);
-    avatarForm.reset();
-    clearValidation(avatarForm, validationConfig);
+  profileAvatar.addEventListener("click", () => { 
+    openModal(avatarPopup); 
+    avatarForm.reset(); 
+    clearValidation(avatarForm, validationConfig); 
   });
-  avatarPopup.querySelector('.popup__close').addEventListener("click", () => closeModal(avatarPopup));
-  avatarForm.addEventListener("submit", handleAvatarFormSubmit);
-  newCardFormElement.addEventListener("submit", handleAddCardFormSubmit);
-  popupTypeEdit.querySelector('.popup__form').addEventListener("submit", handleProfileFormSubmit);
-}
-
+  avatarForm.addEventListener("submit", handleAvatarFormSubmit); 
+  newCardFormElement.addEventListener("submit", handleAddCardFormSubmit); 
+  popupTypeEdit.querySelector('.popup__form').addEventListener("submit", handleProfileFormSubmit); 
+} 
 Promise.all([getUser(), getCards()]).then(([userInfo, cards]) => {
   renderUserInfo(userInfo);
   cards.forEach(card => placeList.append(createCard(card, handleImageClick, handleLike, handleDeleteClick, userInfo._id)));

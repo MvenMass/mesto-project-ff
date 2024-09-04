@@ -1,5 +1,8 @@
 // открытие модального окна
 function openModal(modal) {
+    if (!modal.classList.contains('popup_is-animated')) {
+        modal.classList.add('popup_is-animated'); 
+    }
     modal.classList.add('popup_is-opened');
     document.addEventListener('keydown', closeEscModal);
     modal.addEventListener("click", closeOverlayModal)
@@ -24,7 +27,7 @@ function closeEscModal(event) {
 function closeModal(modal) {
     if (!modal) return; 
     modal.classList.remove('popup_is-opened');
-    modal.classList.add('popup_is-animated');
+    // modal.classList.add('popup_is-animated');
     document.removeEventListener('keydown', closeEscModal);
     modal.removeEventListener("click", closeOverlayModal);
 }

@@ -2,7 +2,7 @@
 import { likeCard, unlikeCard } from "./api.js";
 
 // Функция для создания элемента карточки
-function createCardElement(data, userId, handleImageClick, handleLike, handleDeleteClick) {
+function createCard(data, handleImageClick, handleLike, handleDeleteClick, userId) {
   const { link, name, likes, owner, _id } = data;
   const template = document.querySelector("#card-template").content;
   const cardElement = template.querySelector(".card").cloneNode(true);
@@ -55,9 +55,13 @@ function handleLike(evt) {
 
 
 // Основная функция для создания карточки
-function createCard(data, handleImageClick, handleLike, handleDeleteClick, userId) {
-  return createCardElement(data, userId, handleImageClick, handleLike, handleDeleteClick);
+// function createCard(data, handleImageClick, handleLike, handleDeleteClick, userId) {
+//   return createCardElement(data, userId, handleImageClick, handleLike, handleDeleteClick);
+// }
+
+// Функция удаления карточки из DOM
+function removeCardElement(cardElement) {
+  cardElement.remove();
 }
 
-// Экспорт функций
-export { createCard, handleLike };
+export { createCard, handleLike, removeCardElement };
